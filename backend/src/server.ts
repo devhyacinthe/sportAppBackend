@@ -16,7 +16,7 @@ app.use('/api/nba', nbaRouter);
 
 if (process.env.VERCEL !== '1') {
   app.listen(PORT, () => {
-    console.log(`SportApp backend running on http://localhost:${PORT}`);
+    console.log(`SportApp backend v1 running on http://localhost:${PORT}`);
   });
 }
 
