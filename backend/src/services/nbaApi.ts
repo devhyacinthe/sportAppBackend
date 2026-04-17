@@ -25,11 +25,9 @@ async function fetchTopScorers(
   let cursor: number | null = null;
 
   for (let i = 0; i < 5; i++) {
-    const params = new URLSearchParams([['per_page', '100']]);
-    gameIds.forEach(id => params.append('game_ids[]', String(id)));
-    if (cursor) params.set('cursor', String(cursor));
-
-    const { data } = await client.get('/stats', { params });
+    const idsQuery = gameIds.map(id => `game_ids[]=${id}`).join('&');
+    const cursorQuery = cursor ? `&cursor=${cursor}` : '';
+    const { data } = await client.get(`/stats?per_page=100&${idsQuery}${cursorQuery}`);
     allStats.push(...(data.data ?? []));
     if (!data.meta?.next_cursor) break;
     cursor = data.meta.next_cursor;
@@ -67,9 +65,8 @@ async function fetchTopScorers(
 }
 
 export async function getNBAGames(date?: string) {
-  const params: Record<string, string | number> = { per_page: 30 };
-  params['dates[]'] = date ?? new Date().toISOString().slice(0, 10);
-  const { data } = await client.get('/games', { params });
+  const d = date ?? new Date().toISOString().slice(0, 10);
+  const { data } = await client.get(`/games?per_page=30&dates[]=${d}`);
 
   const games: any[] = data.data ?? [];
 

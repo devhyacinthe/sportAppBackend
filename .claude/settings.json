@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx expo *)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(npx --prefix d:/Personnel/sportApp tsc --noEmit)",
+      "Bash(npm list *)",
+      "Bash(ipconfig)"
+    ]
+  }
+}

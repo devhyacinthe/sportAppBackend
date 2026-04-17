@@ -5,25 +5,43 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0f172a"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sportapp.mobile",
+      "infoPlist": {
+        "NSHealthShareUsageDescription": "SportApp accède à vos données santé pour le suivi des entraînements.",
+        "NSHealthUpdateUsageDescription": "SportApp enregistre vos entraînements dans Santé."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0f172a"
       },
-      "edgeToEdgeEnabled": true
+      "package": "com.sportapp.mobile",
+      "permissions": [
+        "ACTIVITY_RECOGNITION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "scheme": "sportapp",
+    "extra": {
+      "eas": {
+        "projectId": "ef48fc71-0357-4f0e-bd52-aa0e81bfb15c"
+      }
+    },
+    "owner": "devhyacinthe"
   }
 }

@@ -1,41 +1,25 @@
-import Redis from 'ioredis';
+import { Redis } from '@upstash/redis';
 
-// In-memory fallback when Redis is unavailable
 const memCache = new Map<string, { value: string; expiresAt: number }>();
 
-let redisClient: Redis | null = null;
+let upstash: Redis | null = null;
 
-function getRedis(): Redis | null {
-  if (redisClient) return redisClient;
-  if (!process.env.REDIS_URL) return null;
-
-  const client = new Redis(process.env.REDIS_URL, {
-    lazyConnect: true,
-    maxRetriesPerRequest: 1,
-    connectTimeout: 3000,
-  });
-
-  client.on('error', () => {
-    redisClient = null;
-  });
-
-  client.on('connect', () => {
-    console.log('[Redis] Connected');
-    redisClient = client;
-  });
-
-  client.connect().catch(() => {});
-  return client;
+function getUpstash(): Redis | null {
+  if (upstash) return upstash;
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+  upstash = new Redis({ url, token });
+  return upstash;
 }
 
 export async function cacheGet(key: string): Promise<string | null> {
-  const redis = getRedis();
+  const redis = getUpstash();
   if (redis) {
     try {
-      return await redis.get(key);
-    } catch {
-      // fall through to memory cache
-    }
+      const val = await redis.get<string>(key);
+      return val ?? null;
+    } catch {}
   }
   const entry = memCache.get(key);
   if (entry && entry.expiresAt > Date.now()) return entry.value;
@@ -43,14 +27,12 @@ export async function cacheGet(key: string): Promise<string | null> {
 }
 
 export async function cacheSet(key: string, value: string, ttlSeconds: number): Promise<void> {
-  const redis = getRedis();
+  const redis = getUpstash();
   if (redis) {
     try {
-      await redis.set(key, value, 'EX', ttlSeconds);
+      await redis.set(key, value, { ex: ttlSeconds });
       return;
-    } catch {
-      // fall through to memory cache
-    }
+    } catch {}
   }
   memCache.set(key, { value, expiresAt: Date.now() + ttlSeconds * 1000 });
 }
